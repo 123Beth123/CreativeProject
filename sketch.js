@@ -1,288 +1,289 @@
-  let mondrian;
-  let sparks = [];
+let mondrian;
+let sparks = [];
 
-  function createSpark(x, y) {
-    const spark = {
-      x: x,
-      y: y,
-      size: random(2, 5),
-      color: color(255, 0, 0),
-      life: 20
-    };
-    sparks.push(spark);
+function createSpark(x, y) {
+  const spark = {
+    x: x,
+    y: y,
+    size: random(2, 5),
+    color: color(255, 0, 0),
+    life: 20
+  };
+  sparks.push(spark);
+}
+
+function showSparks() {
+  for (let i = sparks.length - 1; i >= 0; i--) {
+    const spark = sparks[i];
+    spark.life--;
+    if (spark.life <= 0) {
+      sparks.splice(i, 1);
+    } else {
+      fill(spark.color);
+      ellipse(spark.x, spark.y, spark.size, spark.size);
+    }
+  }
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight); // Create canvas based on window size
+  mondrian = new Artwork(); // Create a new Artwork instance
+  createArtwork(); // Generate initial artwork
+  windowResized();
+  noLoop(); // Prevent continuous drawing
+  startAnimation(); // Start the animation loop
+}
+
+function draw() {
+  background(255);
+  mondrian.show(); // Display the artwork
+  showSparks(); // Display the sparks
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight); // Adjust canvas size
+  mondrian.scaleShapes(); // Scale shapes to fit new size
+  redraw(); // Redraw canvas
+}
+
+class Artwork {
+  constructor() {
+    this.shapes = []; // Initialize an array to store shapes
   }
 
-  function showSparks() {
-    for (let i = sparks.length - 1; i >= 0; i--) {
-      const spark = sparks[i];
-      spark.life--;
-      if (spark.life <= 0) {
-        sparks.splice(i, 1);
-      } else {
-        fill(spark.color);
-        ellipse(spark.x, spark.y, spark.size, spark.size);
+  addShape(x, y, width, height, color, borderColor, borderWidth, type, endX = null, endY = null, name = null, show = true) {
+    // Add a new shape to the shapes array
+    this.shapes.push(new Shape(x, y, width, height, color, borderColor, borderWidth, type, endX, endY, name, show));
+  }
+
+  scaleShapes() {
+    // Calculate scaling factors
+    const scaleX = windowWidth / 800 / 3 * 2;
+    const scaleY = windowHeight / 800 / 3 * 2;
+
+    const scale = min(scaleX, scaleY);
+
+    // Adjust each shape's size based on scale factors
+    for (let shape of this.shapes) {
+      shape.scale(scale, scale);
+    }
+  }
+
+  show() {
+    // Display each shape in the shapes array
+    for (let shape of this.shapes) {
+      shape.update(); // Update the shape's position or other properties
+      if(shape.showShape)
+        shape.show();
+    }
+  }
+}
+
+class Shape {
+  constructor(x, y, width, height, color, borderColor, borderWidth, type, endX, endY, name,show) {
+    // Define shape properties
+    this.originalX = x;
+    this.originalY = y;
+    this.originalWidth = width;
+    this.originalHeight = height;
+    this.originalEndX = endX;
+    this.originalEndY = endY;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.endX = endX;
+    this.endY = endY;
+    this.color = color;
+    this.borderColor = borderColor;
+    this.borderWidth = borderWidth;
+    this.type = type;
+    this.speedX = 1; // Speed in the x direction
+    this.speedY = 1; // Speed in the y direction
+    this.name = name;
+    this.showShape = show;
+  }
+
+  getName() {
+    return this.name;
+  }
+
+  scale(scaleX, scaleY) {
+    // Scale the shape's position and size by scale factors
+    this.x = this.originalX * scaleX;
+    this.y = this.originalY * scaleY;
+    this.width = this.originalWidth * scaleX;
+    this.height = this.originalHeight * scaleY;
+    if (this.endX !== null) this.endX = this.originalEndX * scaleX;
+    if (this.endY !== null) this.endY = this.originalEndY * scaleY;
+  }
+
+  update() {
+    // Update the shape's position
+    this.x += this.speedX;
+    this.y += this.speedY;
+
+    if (this.type == 'line'){
+      this.endX += this.speedX;
+      this.endY += this.speedY;
+    }
+
+  }
+
+  setShowShape(showShape){
+    this.showShape = showShape;
+  }
+
+  show() {
+    // Set border color and width
+    stroke(this.borderColor);
+    strokeWeight(this.borderWidth);
+    fill(this.color);
+
+    // Draw the shape based on its type
+    if (this.type === 'rectangle') {
+      rect(this.x, this.y, this.width, this.height);
+    } else if (this.type === 'semicircle') {
+      arc(this.x + this.width / 2, this.y + this.height / 2, this.width, this.height, 0, PI);
+    } else if (this.type === 'triangle') {
+      triangle(
+        this.x + this.width / 2, this.y,
+        this.x, this.y + this.height,
+        this.x + this.width, this.y + this.height
+      );
+    } else if (this.type === 'dotted') {
+      this.drawDottedRect();
+    } else if (this.type === 'circle') {
+      ellipse(this.x + this.width / 2, this.y + this.height / 2, this.width);
+    } else if (this.type === 'line') {
+      line(this.x, this.y, this.endX, this.endY);
+    }
+  }
+
+  drawDottedRect() {
+    let dotSize = 5; // Diameter of each dot
+    let spacing = 15; // Spacing between dots
+
+    // Draw dots to form a dotted rectangle
+    for (let y = this.y; y < this.y + this.height; y += spacing) {
+      for (let x = this.x; x < this.x + this.width; x += spacing) {
+        fill(this.color);
+        ellipse(x + dotSize / 2, y + dotSize / 2, dotSize, dotSize);
       }
     }
   }
+}
 
-  function setup() {
-    createCanvas(windowWidth, windowHeight); // Create canvas based on window size
-    mondrian = new Artwork(); // Create a new Artwork instance
-    createArtwork(); // Generate initial artwork
-    noLoop(); // Prevent continuous drawing
-    startAnimation(); // Start the animation loop
-  }
+function createArtwork() {
+  // Add background rectangle
+  mondrian.addShape(0, 0, 800, 800, '#F8F8FF', '#000000', 1, 'rectangle', null, null, 'canvas');
 
-  function draw() {
-    background(255);
-    mondrian.show(); // Display the artwork
-    showSparks(); // Display the sparks
-  }
+  // Background lines
+  mondrian.addShape(300, 200, 0, 0, '#000000', '#000000', 2, 'line', 800, 50);
+  mondrian.addShape(400, 0, 0, 0, '#000000', '#000000', 3, 'line', 400, 800);
+  mondrian.addShape(0, 360, 0, 0, '#000000', '#000000', 3, 'line', 400, 360);
 
-  function windowResized() {
-    resizeCanvas(windowWidth, windowHeight); // Adjust canvas size
-    mondrian.scaleShapes(); // Scale shapes to fit new size
-    redraw(); // Redraw canvas
-  }
+  // Small yellow circle with lines in the upper left corner
+  mondrian.addShape(15, 25, 80, 50, '#FFD700', '#000000', 0, 'circle');
+  mondrian.addShape(17, 45, 0, 0, '#FFD700', '#FFD700', 4, 'line', 17, 100);
+  mondrian.addShape(27, 40, 0, 0, '#FFD700', '#FFD700', 4, 'line', 27, 130);
+  mondrian.addShape(47, 40, 0, 0, '#FFD700', '#FFD700', 4, 'line', 47, 150);
+  mondrian.addShape(67, 40, 0, 0, '#FFD700', '#FFD700', 4, 'line', 67, 130);
+  mondrian.addShape(84, 40, 0, 0, '#FFD700', '#FFD700', 4, 'line', 84, 150);
+  mondrian.addShape(93, 45, 0, 0, '#FFD700', '#FFD700', 4, 'line', 93, 100);
 
-  class Artwork {
-    constructor() {
-      this.shapes = []; // Initialize an array to store shapes
-    }
+  // Light chrysanthemum circle
+  mondrian.addShape(80, 320, 350, 100, '#FAFAD2', '#000000', 0, 'circle');
+  // Red circle
+  mondrian.addShape(300, 450, 400, 100, '#FFA500', '#000000', 0, 'circle');
 
-    addShape(x, y, width, height, color, borderColor, borderWidth, type, endX = null, endY = null, name = null, show = true) {
-      // Add a new shape to the shapes array
-      this.shapes.push(new Shape(x, y, width, height, color, borderColor, borderWidth, type, endX, endY, name, show));
-    }
+  // Middle Lines
+  mondrian.addShape(0, 420, 0, 0, '#000000', '#000000', 3, 'line', 400, 420);
+  mondrian.addShape(380, 420, 0, 0, '#000000', '#000000', 3, 'line', 380, 800);
 
-    scaleShapes() {
-      // Calculate scaling factors
-      const scaleX = windowWidth / 800 / 2;
-      const scaleY = windowHeight / 800 / 2;
+  // Middle red circle
+  mondrian.addShape(350, 350, 200, 50, '#F34213', '#000000', 0, 'circle');
+  mondrian.addShape(600, 80, 200, 50, '#F34213', '#000000', 0, 'circle');
 
-      const scale = min(scaleX, scaleY);
+  // Egg yellow long rectangle
+  mondrian.addShape(450, 1, 250, 500, '#FAFAD2', '#000000', 0, 'rectangle');
+  mondrian.addShape(600, 650, 70, 150, '#FFA500', '#000000', 1, 'rectangle');
+  // Black rectangle
+  mondrian.addShape(40, 300, 400, 60, '#000000', '#000000', 2, 'rectangle');
+  mondrian.addShape(20, 450, 20, 20, '#000000', '#000000', 2, 'rectangle');
+  mondrian.addShape(180, 400, 50, 40, '#000000', '#000000', 2, 'rectangle');
+  mondrian.addShape(450, 360, 15, 200, '#000000', '#000000', 2, 'rectangle');
 
-      // Adjust each shape's size based on scale factors
-      for (let shape of this.shapes) {
-        shape.scale(scale, scale);
-      }
-    }
+  // Blue rectangle
+  mondrian.addShape(300, 260, 400, 100, '#0056B4', '#000000', 2, 'rectangle');
+  mondrian.addShape(400, 630, 400, 50, '#0056B4', '#000000', 2, 'rectangle');
 
-    show() {
-      // Display each shape in the shapes array
-      for (let shape of this.shapes) {
-        shape.update(); // Update the shape's position or other properties
-        if(shape.showShape)
-          shape.show();
-      }
-    }
-  }
+  // Yellow cat's paw
+  mondrian.addShape(400, 230, 40, 50, '#FFD700', '#000000', 0, 'circle');
+  mondrian.addShape(570, 230, 40, 50, '#FFD700', '#000000', 0, 'circle');
 
-  class Shape {
-    constructor(x, y, width, height, color, borderColor, borderWidth, type, endX, endY, name,show) {
-      // Define shape properties
-      this.originalX = x;
-      this.originalY = y;
-      this.originalWidth = width;
-      this.originalHeight = height;
-      this.originalEndX = endX;
-      this.originalEndY = endY;
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-      this.endX = endX;
-      this.endY = endY;
-      this.color = color;
-      this.borderColor = borderColor;
-      this.borderWidth = borderWidth;
-      this.type = type;
-      this.speedX = 1; // Speed in the x direction
-      this.speedY = 1; // Speed in the y direction
-      this.name = name;
-      this.showShape = show;
-    }
+  // Lower left red and black circle
+  mondrian.addShape(150, 520, 50, 50, '#F34213', '#000000', 0, 'circle');
+  mondrian.addShape(40, 570, 50, 50, '#000000', '#000000', 0, 'circle');
 
-    getName() {
-      return this.name;
-    }
+  // Lower left line
+  mondrian.addShape(50, 615, 0, 0, '#000000', '#000000', 3, 'line', 380, 500);
 
-    scale(scaleX, scaleY) {
-      // Scale the shape's position and size by scale factors
-      this.x = this.originalX * scaleX;
-      this.y = this.originalY * scaleY;
-      this.width = this.originalWidth * scaleX;
-      this.height = this.originalHeight * scaleY;
-      if (this.endX !== null) this.endX = this.originalEndX * scaleX;
-      if (this.endY !== null) this.endY = this.originalEndY * scaleY;
-    }
+  // Small dot rectangle
+  mondrian.addShape(305, 262, 500, 100, '#FCE205', '#000000', 0, 'dotted');
 
-    update() {
-      // Update the shape's position
-      this.x += this.speedX;
-      this.y += this.speedY;
+  // Semicircle
+  mondrian.addShape(600, 309, 100, 100, '#F34213', '#000000', 2, 'semicircle');
 
-      if (this.type == 'line'){
-        this.endX += this.speedX;
-        this.endY += this.speedY;
-      }
+  // Cat head
+  mondrian.addShape(445, 150, 50, 50, '#FFD700', '#000000', 0, 'triangle');
+  mondrian.addShape(515, 150, 50, 50, '#FFD700', '#000000', 0, 'triangle');
+  mondrian.addShape(445, 200, 120, 60, '#FFD700', '#000000', 0, 'rectangle');
 
-    }
+  // Cat eyes
+  mondrian.addShape(463, 205, 30, 20, '#000000', '#000000', 0, 'circle', null, null, 'cat1'); // Left eye
+  mondrian.addShape(533, 205, 30, 20, '#000000', '#000000', 0, 'circle', null, null, 'cat2'); // Right eye
 
-    setShowShape(showShape){
-      this.showShape = showShape;
-    }
+      // Middle Lines
+  mondrian.addShape(460, 205, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
+  mondrian.addShape(460, 225, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
+  mondrian.addShape(490, 225, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
+  mondrian.addShape(490, 205, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
 
-    show() {
-      // Set border color and width
-      stroke(this.borderColor);
-      strokeWeight(this.borderWidth);
-      fill(this.color);
+  mondrian.addShape(530, 205, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
+  mondrian.addShape(530, 225, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
+  mondrian.addShape(560, 225, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
+  mondrian.addShape(560, 205, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
+}
 
-      // Draw the shape based on its type
-      if (this.type === 'rectangle') {
-        rect(this.x, this.y, this.width, this.height);
-      } else if (this.type === 'semicircle') {
-        arc(this.x + this.width / 2, this.y + this.height / 2, this.width, this.height, 0, PI);
-      } else if (this.type === 'triangle') {
-        triangle(
-          this.x + this.width / 2, this.y,
-          this.x, this.y + this.height,
-          this.x + this.width, this.y + this.height
-        );
-      } else if (this.type === 'dotted') {
-        this.drawDottedRect();
-      } else if (this.type === 'circle') {
-        ellipse(this.x + this.width / 2, this.y + this.height / 2, this.width);
-      } else if (this.type === 'line') {
-        line(this.x, this.y, this.endX, this.endY);
-      }
-    }
 
-    drawDottedRect() {
-      let dotSize = 5; // Diameter of each dot
-      let spacing = 15; // Spacing between dots
 
-      // Draw dots to form a dotted rectangle
-      for (let y = this.y; y < this.y + this.height; y += spacing) {
-        for (let x = this.x; x < this.x + this.width; x += spacing) {
-          fill(this.color);
-          ellipse(x + dotSize / 2, y + dotSize / 2, dotSize, dotSize);
+let speedX = 2;
+let speedY = 2;
+
+function startAnimation() {
+  setInterval(() => {
+    let flag = 0;
+    for (let shape of mondrian.shapes) {
+      if (shape.name == 'canvas') {
+        if (shape.x < 0 || shape.x + shape.width > width) {
+          speedX *= -1;
+          falg = 1;
+          // createSpark(shape.x, shape.y);
+        }
+        if (shape.y < 0 || shape.y + shape.height > height) {
+          speedY *= -1;
+          flag = 1;
+          // createSpark(shape.x, shape.y);
         }
       }
-    }
-  }
-
-  function createArtwork() {
-    // Add background rectangle
-    mondrian.addShape(0, 0, 800, 800, '#F8F8FF', '#000000', 1, 'rectangle', null, null, 'canvas');
-
-    // Background lines
-    mondrian.addShape(300, 200, 0, 0, '#000000', '#000000', 2, 'line', 800, 50);
-    mondrian.addShape(400, 0, 0, 0, '#000000', '#000000', 3, 'line', 400, 800);
-    mondrian.addShape(0, 360, 0, 0, '#000000', '#000000', 3, 'line', 400, 360);
-
-    // Small yellow circle with lines in the upper left corner
-    mondrian.addShape(15, 25, 80, 50, '#FFD700', '#000000', 0, 'circle');
-    mondrian.addShape(17, 45, 0, 0, '#FFD700', '#FFD700', 4, 'line', 17, 100);
-    mondrian.addShape(27, 40, 0, 0, '#FFD700', '#FFD700', 4, 'line', 27, 130);
-    mondrian.addShape(47, 40, 0, 0, '#FFD700', '#FFD700', 4, 'line', 47, 150);
-    mondrian.addShape(67, 40, 0, 0, '#FFD700', '#FFD700', 4, 'line', 67, 130);
-    mondrian.addShape(84, 40, 0, 0, '#FFD700', '#FFD700', 4, 'line', 84, 150);
-    mondrian.addShape(93, 45, 0, 0, '#FFD700', '#FFD700', 4, 'line', 93, 100);
-
-    // Light chrysanthemum circle
-    mondrian.addShape(80, 320, 350, 100, '#FAFAD2', '#000000', 0, 'circle');
-    // Red circle
-    mondrian.addShape(300, 450, 400, 100, '#FFA500', '#000000', 0, 'circle');
-
-    // Middle Lines
-    mondrian.addShape(0, 420, 0, 0, '#000000', '#000000', 3, 'line', 400, 420);
-    mondrian.addShape(380, 420, 0, 0, '#000000', '#000000', 3, 'line', 380, 800);
-
-    // Middle red circle
-    mondrian.addShape(350, 350, 200, 50, '#F34213', '#000000', 0, 'circle');
-    mondrian.addShape(600, 80, 200, 50, '#F34213', '#000000', 0, 'circle');
-
-    // Egg yellow long rectangle
-    mondrian.addShape(450, 1, 250, 500, '#FAFAD2', '#000000', 0, 'rectangle');
-    mondrian.addShape(600, 650, 70, 150, '#FFA500', '#000000', 1, 'rectangle');
-    // Black rectangle
-    mondrian.addShape(40, 300, 400, 60, '#000000', '#000000', 2, 'rectangle');
-    mondrian.addShape(20, 450, 20, 20, '#000000', '#000000', 2, 'rectangle');
-    mondrian.addShape(180, 400, 50, 40, '#000000', '#000000', 2, 'rectangle');
-    mondrian.addShape(450, 360, 15, 200, '#000000', '#000000', 2, 'rectangle');
-
-    // Blue rectangle
-    mondrian.addShape(300, 260, 400, 100, '#0056B4', '#000000', 2, 'rectangle');
-    mondrian.addShape(400, 630, 400, 50, '#0056B4', '#000000', 2, 'rectangle');
-
-    // Yellow cat's paw
-    mondrian.addShape(400, 230, 40, 50, '#FFD700', '#000000', 0, 'circle');
-    mondrian.addShape(570, 230, 40, 50, '#FFD700', '#000000', 0, 'circle');
-
-    // Lower left red and black circle
-    mondrian.addShape(150, 520, 50, 50, '#F34213', '#000000', 0, 'circle');
-    mondrian.addShape(40, 570, 50, 50, '#000000', '#000000', 0, 'circle');
-
-    // Lower left line
-    mondrian.addShape(50, 615, 0, 0, '#000000', '#000000', 3, 'line', 380, 500);
-
-    // Small dot rectangle
-    mondrian.addShape(305, 262, 500, 100, '#FCE205', '#000000', 0, 'dotted');
-
-    // Semicircle
-    mondrian.addShape(600, 309, 100, 100, '#F34213', '#000000', 2, 'semicircle');
-
-    // Cat head
-    mondrian.addShape(445, 150, 50, 50, '#FFD700', '#000000', 0, 'triangle');
-    mondrian.addShape(515, 150, 50, 50, '#FFD700', '#000000', 0, 'triangle');
-    mondrian.addShape(445, 200, 120, 60, '#FFD700', '#000000', 0, 'rectangle');
-
-    // Cat eyes
-    mondrian.addShape(463, 205, 30, 20, '#000000', '#000000', 0, 'circle', null, null, 'cat1'); // Left eye
-    mondrian.addShape(533, 205, 30, 20, '#000000', '#000000', 0, 'circle', null, null, 'cat2'); // Right eye
-
-        // Middle Lines
-    mondrian.addShape(460, 205, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
-    mondrian.addShape(460, 225, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
-    mondrian.addShape(490, 225, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
-    mondrian.addShape(490, 205, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
-
-    mondrian.addShape(530, 205, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
-    mondrian.addShape(530, 225, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
-    mondrian.addShape(560, 225, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
-    mondrian.addShape(560, 205, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
-  }
-
-
-
-  let speedX = 2;
-  let speedY = 2;
-
-  function startAnimation() {
-    setInterval(() => {
-      let flag = 0;
-      for (let shape of mondrian.shapes) {
-        if (shape.name == 'canvas') {
-          if (shape.x < 0 || shape.x + shape.width > width) {
-            speedX *= -1;
-            falg = 1;
-            // createSpark(shape.x, shape.y);
-          }
-          if (shape.y < 0 || shape.y + shape.height > height) {
-            speedY *= -1;
-            flag = 1;
-            // createSpark(shape.x, shape.y);
-          }
-        }
-        shape.speedX = speedX;
-        shape.speedY = speedY;
-        if(flag == 1 && (shape.name == 'wink1' || shape.name == 'cat1' || shape.name == 'wink2' || shape.name == 'cat2')){
-          shape.showShape = !shape.showShape;
-        }
-        shape.update(); // Update the shape's position
+      shape.speedX = speedX;
+      shape.speedY = speedY;
+      if(flag == 1 && (shape.name == 'wink1' || shape.name == 'cat1' || shape.name == 'wink2' || shape.name == 'cat2')){
+        shape.showShape = !shape.showShape;
       }
-      redraw(); // Redraw the canvas
-    }, 20); // Update every 20 milliseconds
-  }
+      shape.update(); // Update the shape's position
+    }
+    redraw(); // Redraw the canvas
+  }, 20); // Update every 20 milliseconds
+}
