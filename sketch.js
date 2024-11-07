@@ -57,11 +57,14 @@
 
     scaleShapes() {
       // Calculate scaling factors
-      const scaleX = windowWidth / 800;
-      const scaleY = windowHeight / 800;
+      const scaleX = windowWidth / 800 / 2;
+      const scaleY = windowHeight / 800 / 2;
+
+      const scale = min(scaleX, scaleY);
+
       // Adjust each shape's size based on scale factors
       for (let shape of this.shapes) {
-        shape.scale(scaleX, scaleY);
+        shape.scale(scale, scale);
       }
     }
 
@@ -265,12 +268,12 @@
           if (shape.x < 0 || shape.x + shape.width > width) {
             speedX *= -1;
             falg = 1;
-            createSpark(shape.x, shape.y);
+            // createSpark(shape.x, shape.y);
           }
           if (shape.y < 0 || shape.y + shape.height > height) {
             speedY *= -1;
             flag = 1;
-            createSpark(shape.x, shape.y);
+            // createSpark(shape.x, shape.y);
           }
         }
         shape.speedX = speedX;
