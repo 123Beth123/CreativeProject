@@ -24,9 +24,9 @@ class Artwork {
     this.shapes = []; // Initialize an array to store shapes
   }
 
-  addShape(x, y, width, height, color, borderColor, borderWidth, type, endX = null, endY = null) {
+  addShape(x, y, width, height, color, borderColor, borderWidth, type, endX = null, endY = null, name = null) {
     // Add a new shape to the shapes array
-    this.shapes.push(new Shape(x, y, width, height, color, borderColor, borderWidth, type, endX, endY));
+    this.shapes.push(new Shape(x, y, width, height, color, borderColor, borderWidth, type, endX, endY, name));
   }
 
   scaleShapes() {
@@ -49,7 +49,7 @@ class Artwork {
 }
 
 class Shape {
-  constructor(x, y, width, height, color, borderColor, borderWidth, type, endX, endY) {
+  constructor(x, y, width, height, color, borderColor, borderWidth, type, endX, endY, name) {
     // Define shape properties
     this.originalX = x;
     this.originalY = y;
@@ -67,8 +67,13 @@ class Shape {
     this.borderColor = borderColor;
     this.borderWidth = borderWidth;
     this.type = type;
-    this.speedX = 0; // Speed in the x direction
-    this.speedY = 0; // Speed in the y direction
+    this.speedX = 1; // Speed in the x direction
+    this.speedY = 1; // Speed in the y direction
+    this.name = name;
+  }
+
+  getName() {
+    return this.name;
   }
 
   scale(scaleX, scaleY) {
@@ -86,13 +91,18 @@ class Shape {
     this.x += this.speedX;
     this.y += this.speedY;
 
+    if (this.type == 'line'){
+      this.endX += this.speedX;
+      this.endY += this.speedY;
+    }
+
     // Bounce off the edges of the canvas
-    if (this.x < 0 || this.x + this.width > width) {
-      this.speedX *= -1;
-    }
-    if (this.y < 0 || this.y + this.height > height) {
-      this.speedY *= -1;
-    }
+    // if (this.x < 0 || this.x + this.width > width) {
+    //   this.speedX *= -1;
+    // }
+    // if (this.y < 0 || this.y + this.height > height) {
+    //   this.speedY *= -1;
+    // }
   }
 
   show() {
@@ -137,7 +147,7 @@ class Shape {
 
 function createArtwork() {
   // Add background rectangle
-  mondrian.addShape(0, 0, 800, 800, '#F8F8FF', '#000000', 1, 'rectangle');
+  mondrian.addShape(0, 0, 800, 800, '#F8F8FF', '#000000', 1, 'rectangle', null, null, 'canvas');
 
   // Background lines
   mondrian.addShape(300, 200, 0, 0, '#000000', '#000000', 2, 'line', 800, 50);
@@ -202,15 +212,23 @@ function createArtwork() {
   mondrian.addShape(445, 200, 120, 60, '#FFD700', '#000000', 0, 'rectangle');
 }
 
+let speedX = 1;
+let speedY = 1;
+
 function startAnimation() {
   setInterval(() => {
+    
     for (let shape of mondrian.shapes) {
-      if (shape.type === 'circle' || shape.type === 'rectangle') {
-        shape.speedX = random(-5, 5);
-        shape.speedY = random(-5, 5);
-        shape.color = `#${Math.floor(Math.random()*16777215).toString(16)}`; // Random color
+      if (shape.name == 'canvas' && (shape.x < 0 || shape.x + shape.width > width)) {
+        speedX *= -1;
       }
+      if (shape.name == 'canvas' &&  (shape.y < 0 || shape.y + shape.height > height)) {
+        speedY *= -1;
+      }
+      shape.speedX = speedX;
+      shape.speedY = speedY;
+      shape.update(); // Update the shape's position
     }
-    redraw();
-  }, 50); // Update every 50 milliseconds
+    redraw(); // Redraw the canvas
+  }, 20); // Update every 50 milliseconds
 }
