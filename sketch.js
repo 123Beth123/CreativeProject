@@ -96,13 +96,6 @@ class Shape {
       this.endY += this.speedY;
     }
 
-    // Bounce off the edges of the canvas
-    // if (this.x < 0 || this.x + this.width > width) {
-    //   this.speedX *= -1;
-    // }
-    // if (this.y < 0 || this.y + this.height > height) {
-    //   this.speedY *= -1;
-    // }
   }
 
   show() {
@@ -210,6 +203,10 @@ function createArtwork() {
   mondrian.addShape(445, 150, 50, 50, '#FFD700', '#000000', 0, 'triangle');
   mondrian.addShape(515, 150, 50, 50, '#FFD700', '#000000', 0, 'triangle');
   mondrian.addShape(445, 200, 120, 60, '#FFD700', '#000000', 0, 'rectangle');
+
+  // Cat eyes
+  mondrian.addShape(465, 165, 10, 20, '#000000', '#000000', 0, 'circle'); // Left eye
+  mondrian.addShape(535, 165, 10, 20, '#000000', '#000000', 0, 'circle'); // Right eye
 }
 
 let speedX = 1;
