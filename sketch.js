@@ -1,4 +1,29 @@
 let mondrian;
+let sparks = [];
+
+function createSpark(x, y) {
+  const spark = {
+    x: x,
+    y: y,
+    size: random(2, 5),
+    color: color(255, 0, 0),
+    life: 20
+  };
+  sparks.push(spark);
+}
+
+function showSparks() {
+  for (let i = sparks.length - 1; i >= 0; i--) {
+    const spark = sparks[i];
+    spark.life--;
+    if (spark.life <= 0) {
+      sparks.splice(i, 1);
+    } else {
+      fill(spark.color);
+      ellipse(spark.x, spark.y, spark.size, spark.size);
+    }
+  }
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight); // Create canvas based on window size
@@ -11,6 +36,7 @@ function setup() {
 function draw() {
   background(255);
   mondrian.show(); // Display the artwork
+  showSparks(); // Display the sparks
 }
 
 function windowResized() {
@@ -205,27 +231,32 @@ function createArtwork() {
   mondrian.addShape(445, 200, 120, 60, '#FFD700', '#000000', 0, 'rectangle');
 
   // Cat eyes
-  mondrian.addShape(465, 165, 10, 20, '#000000', '#000000', 0, 'circle'); // Left eye
-  mondrian.addShape(535, 165, 10, 20, '#000000', '#000000', 0, 'circle'); // Right eye
+  // mondrian.addShape(463, 165, 15, 20, '#000000', '#000000', 0, 'circle'); // Left eye
+  // mondrian.addShape(533, 165, 15, 20, '#000000', '#000000', 0, 'circle'); // Right eye
 }
+
+
 
 let speedX = 1;
 let speedY = 1;
 
 function startAnimation() {
   setInterval(() => {
-    
     for (let shape of mondrian.shapes) {
-      if (shape.name == 'canvas' && (shape.x < 0 || shape.x + shape.width > width)) {
-        speedX *= -1;
-      }
-      if (shape.name == 'canvas' &&  (shape.y < 0 || shape.y + shape.height > height)) {
-        speedY *= -1;
+      if (shape.name == 'canvas') {
+        if (shape.x < 0 || shape.x + shape.width > width) {
+          speedX *= -1;
+          createSpark(shape.x, shape.y);
+        }
+        if (shape.y < 0 || shape.y + shape.height > height) {
+          speedY *= -1;
+          createSpark(shape.x, shape.y);
+        }
       }
       shape.speedX = speedX;
       shape.speedY = speedY;
       shape.update(); // Update the shape's position
     }
     redraw(); // Redraw the canvas
-  }, 20); // Update every 50 milliseconds
+  }, 20); // Update every 20 milliseconds
 }
