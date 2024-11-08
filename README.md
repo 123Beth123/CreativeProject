@@ -24,13 +24,6 @@ This project is an interactive digital artwork inspired by the style of Piet Mon
 
 ​	My design was inspired by the classic game Snake. In Snake, the snake dies if it touches a wall. My work borrows on this mechanism, and whenever the painting touches the edge of the screen, the cat's eyes switch to the display state, showing a change similar to the state of death, and the effect of "death" is enhanced by switching the display state.
 
-## Features
-
-- **Dynamic Canvas**: The canvas adjusts to the window size, ensuring the artwork looks good on any device.
-- **Interactive Shapes**: Shapes within the artwork move and bounce off the edges of the canvas, creating a lively and engaging visual experience.
-- **Cat Animation**: These include a playful cat face that turns into a "dead" state when the canvas bounces.
-- **Responsive Design**: The artwork scales and repositions itself when the window is resized, maintaining its aesthetic appeal.
-
 ## How It Works
 
 ### Initialization
