@@ -1,5 +1,4 @@
 let mondrian;
-let sparks = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight); // Create canvas based on window size
@@ -13,7 +12,6 @@ function setup() {
 function draw() {
   background(255);
   mondrian.show(); // Display the artwork
-  showSparks(); // Display the sparks
 }
 
 function windowResized() {
@@ -221,15 +219,15 @@ function createArtwork() {
   mondrian.addShape(533, 205, 30, 20, '#000000', '#000000', 0, 'circle', null, null, 'cat2'); // Right eye
 
       // Middle Lines
-  mondrian.addShape(460, 205, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
-  mondrian.addShape(460, 225, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
-  mondrian.addShape(490, 225, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
-  mondrian.addShape(490, 205, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'wink1', false);
+  mondrian.addShape(460, 205, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'catevent1', false);
+  mondrian.addShape(460, 225, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'catevent1', false);
+  mondrian.addShape(490, 225, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'catevent1', false);
+  mondrian.addShape(490, 205, 0, 0, '#000000', '#000000', 3, 'line', 476, 215, 'catevent1', false);
 
-  mondrian.addShape(530, 205, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
-  mondrian.addShape(530, 225, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
-  mondrian.addShape(560, 225, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
-  mondrian.addShape(560, 205, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'wink2', false);
+  mondrian.addShape(530, 205, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'catevent2', false);
+  mondrian.addShape(530, 225, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'catevent2', false);
+  mondrian.addShape(560, 225, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'catevent2', false);
+  mondrian.addShape(560, 205, 0, 0, '#000000', '#000000', 3, 'line', 546, 215, 'catevent2', false);
 }
 
 
@@ -255,7 +253,7 @@ function startAnimation() {
       }
       shape.speedX = speedX;
       shape.speedY = speedY;
-      if(flag == 1 && (shape.name == 'wink1' || shape.name == 'cat1' || shape.name == 'wink2' || shape.name == 'cat2')){
+      if(flag == 1 && (shape.name == 'catevent1' || shape.name == 'cat1' || shape.name == 'catevent2' || shape.name == 'cat2')){
         shape.showShape = !shape.showShape;
       }
       shape.update(); // Update the shape's position
