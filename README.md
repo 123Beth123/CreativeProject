@@ -1,8 +1,8 @@
-# 动态蒙德里安艺术动画项目
+# Dynamic Mondrian Art Animation Project
 
 ## Overview
 
-This project is an interactive digital artwork inspired by the style of Piet Mondrian, featuring dynamic shapes that move and animate over time. The artwork is created using the p5.js library, which provides a JavaScript environment for visual arts.
+This project is an interactive digital artwork inspired by the style of Piet Mondrian, featuring dynamic shapes that move and animate over time. The artwork is created using the p5.js library.
 
 ## **Interactive Instructions**
 
@@ -28,7 +28,7 @@ This project is an interactive digital artwork inspired by the style of Piet Mon
 
 - **Dynamic Canvas**: The canvas adjusts to the window size, ensuring the artwork looks good on any device.
 - **Interactive Shapes**: Shapes within the artwork move and bounce off the edges of the canvas, creating a lively and engaging visual experience.
-- **Cat Animation**: A playful cat's face is included, with eyes that can "dead" when the canvas bounces.
+- **Cat Animation**: These include a playful cat face that turns into a "dead" state when the canvas bounces.
 - **Responsive Design**: The artwork scales and repositions itself when the window is resized, maintaining its aesthetic appeal.
 
 ## How It Works
