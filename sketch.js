@@ -1,30 +1,6 @@
 let mondrian;
 let sparks = [];
 
-function createSpark(x, y) {
-  const spark = {
-    x: x,
-    y: y,
-    size: random(2, 5),
-    color: color(255, 0, 0),
-    life: 20
-  };
-  sparks.push(spark);
-}
-
-function showSparks() {
-  for (let i = sparks.length - 1; i >= 0; i--) {
-    const spark = sparks[i];
-    spark.life--;
-    if (spark.life <= 0) {
-      sparks.splice(i, 1);
-    } else {
-      fill(spark.color);
-      ellipse(spark.x, spark.y, spark.size, spark.size);
-    }
-  }
-}
-
 function setup() {
   createCanvas(windowWidth, windowHeight); // Create canvas based on window size
   mondrian = new Artwork(); // Create a new Artwork instance
